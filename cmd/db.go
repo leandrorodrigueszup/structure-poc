@@ -2,16 +2,16 @@ package main
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
+	"poc/internal/configuration"
+	"poc/internal/repository"
+
 	"github.com/golang-migrate/migrate/v4"
 	pgMigrate "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"poc/internal/configuration"
-	"poc/internal/repository"
 )
 
 type persistenceManager struct {
@@ -82,9 +82,9 @@ func runMigrations(sqlDb *sql.DB) error {
 
 func loadPersistenceManager(db *gorm.DB) (persistenceManager, error) {
 	queriesPath := configuration.Get("QUERIES_PATH")
-	userRepo, err := repository.NewUserRepository(db, queriesPath)
+	userRepo, err := repository.NewUserRepository(&repository.DBWrapper{DB: db}, queriesPath)
 	if err != nil {
-		return persistenceManager{}, errors.New(fmt.Sprintf("Cannot instantiate user repository with error: %s", err.Error()))
+		return persistenceManager{}, fmt.Errorf("Cannot instantiate user repository with error: %s", err.Error())
 	}
 
 	return persistenceManager{

@@ -2,6 +2,14 @@ package main
 
 import (
 	"fmt"
+	"poc/internal/logging"
+	"poc/internal/use_case/user"
+	"poc/web/api/handlers"
+	handlersV1 "poc/web/api/handlers/v1"
+	"poc/web/api/middlewares"
+	"reflect"
+	"strings"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -12,13 +20,6 @@ import (
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 	"github.com/leebenson/conform"
-	"poc/internal/logging"
-	"poc/internal/use_case/user"
-	"poc/web/api/handlers"
-	handlersV1 "poc/web/api/handlers/v1"
-	"poc/web/api/middlewares"
-	"reflect"
-	"strings"
 )
 
 type server struct {
@@ -117,7 +118,7 @@ func casbinEnforcer() (*casbin.Enforcer, error) {
 }
 
 func (s server) registerRoutes() {
-	authMiddleware := middlewares.NewAuthMiddleware(s.pm.userRepository, s.enforcer)
+	//authMiddleware := middlewares.NewAuthMiddleware(s.pm.userRepository, s.enforcer)
 	api := s.echo.Group("/api")
 	{
 		api.GET("/health", handlers.Health())
@@ -125,7 +126,7 @@ func (s server) registerRoutes() {
 	}
 
 	v1 := api.Group("/v1")
-	v1.Use(authMiddleware.Auth)
+	//v1.Use(authMiddleware.Auth)
 	{
 		userHandler := v1.Group("/users")
 		{
